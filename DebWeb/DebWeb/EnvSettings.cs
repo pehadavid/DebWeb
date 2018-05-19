@@ -62,17 +62,25 @@ namespace DebWeb
             /// </summary>
             /// <returns></returns>
             public bool UseLetsencrypt { get; set; }
-            public List<string> Dns { get; set; }
 
+            /// <summary>
+            /// Dns that should be handled by your web app
+            /// </summary>
+            /// <returns></returns>
+            public List<string> Dns { get; set; }
+            public string ProjetCommand { get; set; }
+            public string ProxyPass { get; set; }
             public void CheckConfiguration()
             {
                 ThrowIfEmpty(nameof(ProjectPath), ProjectPath);
                 ThrowIfEmpty(nameof(ProjectName), ProjectName);
                 ThrowIfEmpty(nameof(UserName), UserName);
+                ThrowIfEmpty(nameof(ProjetCommand), ProjetCommand);
+                ThrowIfEmpty(nameof(ProxyPass), ProxyPass);
                 ThrowIfCollectionEmpty<string>(nameof(Dns), Dns);
 
-                
-   
+
+
             }
         }
 
