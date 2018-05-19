@@ -1,0 +1,7 @@
+{
+    "systemdPath": "/etc/systemd/system",
+    "sitesAvailableNginx": "/etc/nginx/sites-available",
+    "sitesEnabledNginx": "/etc/nginx/sites-enabled",
+    "sudoersPath": "/etc/sudoers.d",
+    "letsencryptPath": "/opt/letsencrypt"
+}

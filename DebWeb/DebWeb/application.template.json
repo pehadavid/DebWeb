@@ -1,0 +1,11 @@
+{
+    "projectPath": "/home/johdoe/myapp",
+    "userName": "johndoe",
+    "projectName": "myapp",
+    "useLetsencrypt": false,
+    "dns": [
+        "mydomain.com",
+        "sub.mydomain.com",
+        "sub2.mydomain.com"
+    ]
+}
