@@ -144,7 +144,7 @@ namespace DebWeb
             }
 
             Console.WriteLine("All done ! be sure to check that your systemd is running :");
-            $"systemctl status {appSettings.ProjectName}".Bash();
+            $"systemctl status {appSettings.ProjectName}.service".Bash();
 
         }
 
