@@ -32,7 +32,7 @@ namespace DebWeb
             builder.AppendLine("server {");
             builder.AppendLine($"  listen 80;");
             builder.AppendLine($"  server_name {string.Join(" ", appSettings.Dns)};");
-            builder.AppendLine($"  root {appSettings.ProjectPath};");
+            builder.AppendLine($"  root {appSettings.GetWWWLE()};");
             builder.AppendLine(@"  location ~ /\.well-known/acme-challenge {");
             builder.AppendLine(@"     allow all;");
             builder.AppendLine(@"  }");
@@ -57,7 +57,7 @@ namespace DebWeb
             builder.AppendLine("server {");
             builder.AppendLine($"  listen 80;");
             builder.AppendLine($"  server_name {string.Join(" ", appSettings.Dns)};");
-            builder.AppendLine($"  root {appSettings.ProjectPath};");
+            builder.AppendLine($"  root {appSettings.GetWWWLE()};");
             builder.AppendLine(@"  location ~ /\.well-known/acme-challenge {");
             builder.AppendLine(@"     allow all;");
             builder.AppendLine(@"  }");
@@ -94,6 +94,11 @@ namespace DebWeb
             builder.AppendLine("}");
 
             return builder.ToString();
+        }
+
+        public override Task WriteFileAsync(){
+            $"sudo mkdir -p {appSettings.GetWWWLE()}".Bash();
+            return base.WriteFileAsync();
         }
 
 

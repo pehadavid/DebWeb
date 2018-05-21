@@ -90,6 +90,11 @@ namespace DebWeb
                 ThrowIf(nameof(UserEmail), UseLetsencrypt && string.IsNullOrWhiteSpace(UserEmail));
                 ThrowIfCollectionEmpty<string>(nameof(Dns), Dns);
             }
+
+            public string GetWWWLE()
+            {
+                return $"/var/www/{ProjectName}.le";
+            }
         }
 
 
