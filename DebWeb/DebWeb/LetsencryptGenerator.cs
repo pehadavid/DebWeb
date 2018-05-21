@@ -4,7 +4,7 @@ namespace DebWeb
     {
         public static void GenerateCert( EnvSettings.SystemSettings systemSettings,EnvSettings.AppSettings appSettings)
         {
-            $"sudo {systemSettings.LetsencryptPath}/letsencrypt-auto certonly --rsa-key-size 4096 --webroot --webroot-path {appSettings.ProjectPath} -d {string.Join(" -d ", appSettings.Dns)}".Bash();
+            $"sudo {systemSettings.LetsencryptPath}/certbot-auto certonly --email {appSettings.UserEmail} --rsa-key-size 4096 --webroot --webroot-path {appSettings.ProjectPath} -d {string.Join(" -d ", appSettings.Dns)}".Bash();
         }
 
         public static string GetSslCertFullchain(string domainName)

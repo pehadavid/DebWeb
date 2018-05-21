@@ -1,6 +1,7 @@
 {
     "projectPath": "/home/johdoe/myapp",
     "userName": "johndoe",
+    "userEmail": "john@doe.com",
     "projectName": "myapp",
     "projetCommand": "/usr/bin/dotnet /home/johndoe/myapp/release/MyApp.dll",
     "proxyPass": "http://localhost:5000",
