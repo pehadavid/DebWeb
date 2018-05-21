@@ -81,13 +81,14 @@ namespace DebWeb
         {
 
 
-            "service nginx reload".Bash();
+
             $"systemctl stop {appSettings.ProjectName}".Bash();
             var generators = FileTemplate.GetAllGenerators(systemSettings, appSettings);
             foreach (var gen in generators)
             {
                 File.Delete(gen.Value.GetFilePath());
             }
+            "service nginx reload".Bash();
             return Task.CompletedTask;
 
         }
@@ -133,7 +134,7 @@ namespace DebWeb
                 {
                     File.Delete(file);
                     Console.WriteLine($"{file} deleted !");
-                    return;
+                   
                 }
             }
             else
@@ -142,16 +143,26 @@ namespace DebWeb
                 SetupSsl(systemSettings, appSettings);
             }
 
+            Console.WriteLine("All done ! be sure to check that your systemd is running :");
+            $"systemctl status {appSettings.ProjectName}".Bash();
+
         }
 
         private static void SetupSsl(EnvSettings.SystemSettings systemSettings, EnvSettings.AppSettings appSettings)
         {
             if (appSettings.UseLetsencrypt)
             {
+                Console.WriteLine("Generating SSL certificate ...");
                 LetsencryptGenerator.GenerateCert(systemSettings, appSettings);
+                Console.WriteLine("Reconfiguring Nginx ...");
                 NginxTemplate nginxTemplate = new NginxTemplate(systemSettings, appSettings, true);
                 nginxTemplate.WriteFileAsync();
+                Console.WriteLine("Reloading Nginx ...");
                 "service nginx reload".Bash();
+                Console.WriteLine("SSL setup done !");
+            }
+            else {
+                Console.WriteLine("This project does not use SSL.");
             }
         }
 
@@ -196,7 +207,9 @@ namespace DebWeb
 
         private static void StartServices(EnvSettings.SystemSettings systemSettings, EnvSettings.AppSettings appSettings)
         {
+            Console.WriteLine("Starting systemd service.");
             $"systemctl start {appSettings.ProjectName}".Bash();
+             Console.WriteLine("Starting Nginx virtualhost.");
             $"ln -s {systemSettings.SitesAvailableNginx}/{appSettings.ProjectName} {systemSettings.SitesEnabledNginx}/{appSettings.ProjectName}".Bash();
             "service nginx reload".Bash();
 
