@@ -29,7 +29,7 @@ namespace DebWeb
             }
             public void ThrowIf(string fieldName, bool cond, string additionalMessage = "")
             {
-                if (!cond)
+                if (cond)
                     throw new InvalidConfigurationException($"{fieldName} is not valid. ({additionalMessage})");
             }
             public void ThrowIfNotDirectory(string path)
