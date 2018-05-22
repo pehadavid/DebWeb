@@ -135,16 +135,13 @@ namespace DebWeb
             ReviewFiles(files);
             if (MustRollback(files))
             {
-                foreach (var file in files)
-                {
-                    File.Delete(file);
-                    Console.WriteLine($"{file} deleted !");
-
-                }
+               await DeleteServiceAsync(systemSettings, appSettings);
             }
             else
             {
                 StartServices(systemSettings, appSettings);
+                Console.WriteLine($"Service {appSettings.ProjectName} should respond on http://{appSettings.Dns.FirstOrDefault()}, you should check in browser. (Press a key to continue.)");
+                Console.ReadKey();
                 SetupSsl(systemSettings, appSettings);
             }
 
