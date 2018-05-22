@@ -135,12 +135,7 @@ namespace DebWeb
             ReviewFiles(files);
             if (MustRollback(files))
             {
-                foreach (var file in files)
-                {
-                    File.Delete(file);
-                    Console.WriteLine($"{file} deleted !");
-
-                }
+               await DeleteServiceAsync(systemSettings, appSettings);
             }
             else
             {
