@@ -87,7 +87,12 @@ namespace DebWeb
             foreach (var gen in generators)
             {
                 File.Delete(gen.Value.GetFilePath());
+                if (gen.Value is NginxTemplate)
+                {
+                       ((NginxTemplate) gen.Value).DisableSite();
+                }
             }
+            Directory.Delete(appSettings.GetWWWLE(), true);
             "service nginx reload".Bash();
             return Task.CompletedTask;
 
@@ -134,7 +139,7 @@ namespace DebWeb
                 {
                     File.Delete(file);
                     Console.WriteLine($"{file} deleted !");
-                   
+
                 }
             }
             else
@@ -143,8 +148,8 @@ namespace DebWeb
                 SetupSsl(systemSettings, appSettings);
             }
 
-            Console.WriteLine("All done ! be sure to check that your systemd is running :");
-            $"systemctl status {appSettings.ProjectName}.service".Bash();
+            Console.WriteLine("All done ! be sure to check that your systemd service is in a expected state :");
+            $"systemctl status {appSettings.ProjectName}".Bash();
 
         }
 
@@ -161,7 +166,8 @@ namespace DebWeb
                 "service nginx reload".Bash();
                 Console.WriteLine("SSL setup done !");
             }
-            else {
+            else
+            {
                 Console.WriteLine("This project does not use SSL.");
             }
         }
@@ -209,8 +215,9 @@ namespace DebWeb
         {
             Console.WriteLine("Starting systemd service.");
             $"systemctl start {appSettings.ProjectName}".Bash();
-             Console.WriteLine("Starting Nginx virtualhost.");
-            $"ln -s {systemSettings.SitesAvailableNginx}/{appSettings.ProjectName} {systemSettings.SitesEnabledNginx}/{appSettings.ProjectName}".Bash();
+            Console.WriteLine("Starting Nginx virtualhost.");
+            NginxTemplate nginxTemplate = new NginxTemplate(systemSettings, appSettings);
+            nginxTemplate.EnableSite();
             "service nginx reload".Bash();
 
         }

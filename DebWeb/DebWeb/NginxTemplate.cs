@@ -98,7 +98,23 @@ namespace DebWeb
 
         public override Task WriteFileAsync(){
             $"sudo mkdir -p {appSettings.GetWWWLE()}".Bash();
+            SetPermissions();
             return base.WriteFileAsync();
+        }
+
+        public void EnableSite()
+        {
+            $"ln -s {systemSettings.SitesAvailableNginx}/{appSettings.ProjectName} {systemSettings.SitesEnabledNginx}/{appSettings.ProjectName}".Bash();
+        }
+
+        public void DisableSite()
+        {
+            $"rm {systemSettings.SitesEnabledNginx}/{appSettings.ProjectName}".Bash();
+        }
+
+        public void SetPermissions()
+        {
+            $"chown -R www-data:www-data {appSettings.GetWWWLE()}".Bash();
         }
 
 
