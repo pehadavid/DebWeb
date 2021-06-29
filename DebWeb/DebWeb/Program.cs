@@ -81,13 +81,19 @@ namespace DebWeb
         {
 
 
-            "service nginx reload".Bash();
+
             $"systemctl stop {appSettings.ProjectName}".Bash();
             var generators = FileTemplate.GetAllGenerators(systemSettings, appSettings);
             foreach (var gen in generators)
             {
                 File.Delete(gen.Value.GetFilePath());
+                if (gen.Value is NginxTemplate)
+                {
+                       ((NginxTemplate) gen.Value).DisableSite();
+                }
             }
+            Directory.Delete(appSettings.GetWWWLE(), true);
+            "service nginx reload".Bash();
             return Task.CompletedTask;
 
         }
@@ -129,18 +135,18 @@ namespace DebWeb
             ReviewFiles(files);
             if (MustRollback(files))
             {
-                foreach (var file in files)
-                {
-                    File.Delete(file);
-                    Console.WriteLine($"{file} deleted !");
-                    return;
-                }
+               await DeleteServiceAsync(systemSettings, appSettings);
             }
             else
             {
                 StartServices(systemSettings, appSettings);
+                Console.WriteLine($"Service {appSettings.ProjectName} should respond on http://{appSettings.Dns.FirstOrDefault()}, you should check in browser. (Press a key to continue.)");
+                Console.ReadKey();
                 SetupSsl(systemSettings, appSettings);
             }
+
+            Console.WriteLine("All done ! be sure to check that your systemd service is in a expected state :");
+            $"systemctl status {appSettings.ProjectName}".Bash();
 
         }
 
@@ -148,10 +154,18 @@ namespace DebWeb
         {
             if (appSettings.UseLetsencrypt)
             {
+                Console.WriteLine("Generating SSL certificate ...");
                 LetsencryptGenerator.GenerateCert(systemSettings, appSettings);
+                Console.WriteLine("Reconfiguring Nginx ...");
                 NginxTemplate nginxTemplate = new NginxTemplate(systemSettings, appSettings, true);
                 nginxTemplate.WriteFileAsync();
+                Console.WriteLine("Reloading Nginx ...");
                 "service nginx reload".Bash();
+                Console.WriteLine("SSL setup done !");
+            }
+            else
+            {
+                Console.WriteLine("This project does not use SSL.");
             }
         }
 
@@ -196,8 +210,11 @@ namespace DebWeb
 
         private static void StartServices(EnvSettings.SystemSettings systemSettings, EnvSettings.AppSettings appSettings)
         {
+            Console.WriteLine("Starting systemd service.");
             $"systemctl start {appSettings.ProjectName}".Bash();
-            $"ln -s {systemSettings.SitesAvailableNginx}/{appSettings.ProjectName} {systemSettings.SitesEnabledNginx}/{appSettings.ProjectName}".Bash();
+            Console.WriteLine("Starting Nginx virtualhost.");
+            NginxTemplate nginxTemplate = new NginxTemplate(systemSettings, appSettings);
+            nginxTemplate.EnableSite();
             "service nginx reload".Bash();
 
         }

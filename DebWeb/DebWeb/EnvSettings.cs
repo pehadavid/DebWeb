@@ -27,7 +27,11 @@ namespace DebWeb
                 if (!cond)
                     throw new InvalidConfigurationException($"{fieldName} is not valid. ({additionalMessage})");
             }
-
+            public void ThrowIf(string fieldName, bool cond, string additionalMessage = "")
+            {
+                if (cond)
+                    throw new InvalidConfigurationException($"{fieldName} is not valid. ({additionalMessage})");
+            }
             public void ThrowIfNotDirectory(string path)
             {
                 if (!Directory.Exists(path))
@@ -58,6 +62,12 @@ namespace DebWeb
             public string UserName { get; set; }
 
             /// <summary>
+            /// Email for let's encrypt setup
+            /// </summary>
+            /// <returns></returns>
+            public string UserEmail { get; set; }
+
+            /// <summary>
             /// If true, it will try to setup nginx to serve webservice with SSL
             /// </summary>
             /// <returns></returns>
@@ -77,10 +87,13 @@ namespace DebWeb
                 ThrowIfEmpty(nameof(UserName), UserName);
                 ThrowIfEmpty(nameof(ProjetCommand), ProjetCommand);
                 ThrowIfEmpty(nameof(ProxyPass), ProxyPass);
+                ThrowIf(nameof(UserEmail), UseLetsencrypt && string.IsNullOrWhiteSpace(UserEmail));
                 ThrowIfCollectionEmpty<string>(nameof(Dns), Dns);
+            }
 
-
-
+            public string GetWWWLE()
+            {
+                return $"/var/www/{ProjectName}.le";
             }
         }
 
